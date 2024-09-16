@@ -4,7 +4,6 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const axios = require('axios');
 const multer = require('multer');
-const User = require('../models/User');
 
 // Configuración de multer para cargar imágenes
 const upload = multer({ dest: 'uploads/' });
@@ -12,15 +11,7 @@ const upload = multer({ dest: 'uploads/' });
 // Clave secreta para JWT
 const JWT_SECRET = 'supersecretkey';
 
-router.get('/api/users', async (req, res) => {
-  try {
-    const users = await User.find(); // Obtener todos los usuarios
-    res.json(users);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: 'Error del servidor' });
-  }
-});
+
 
 // Ruta de registro
 router.post('/register', upload.single('image'), async (req, res) => {
