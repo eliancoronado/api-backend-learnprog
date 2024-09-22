@@ -6,17 +6,23 @@ const Teacher = require('../models/Teacher');
 const Student = require('../models/Students');
 
 // Registro de usuario
+const DEFAULT_IMAGE_URL = 'https://i.postimg.cc/zvgYtwSn/logofaceboo.webp';
+
 exports.register = async (req, res) => {
   const { username, email, password, role } = req.body;
-  const image = req.file;
+  const image = req.file; // Verificamos si se ha subido una imagen
 
   try {
-    // Subir imagen a imgbb
-    const formData = new FormData();
-    formData.append('image', image.buffer.toString('base64'));
+    let profileImageUrl = DEFAULT_IMAGE_URL; // URL por defecto
 
-    const imgbbResponse = await axios.post(`https://api.imgbb.com/1/upload?key=${process.env.IMGBB_API_KEY}`, formData);
-    const profileImageUrl = imgbbResponse.data.data.url;
+    // Subir imagen a imgbb solo si hay imagen
+    if (image) {
+      const formData = new FormData();
+      formData.append('image', image.buffer.toString('base64'));
+
+      const imgbbResponse = await axios.post(`https://api.imgbb.com/1/upload?key=${process.env.IMGBB_API_KEY}`, formData);
+      profileImageUrl = imgbbResponse.data.data.url; // Imagen subida por el usuario
+    }
 
     // Hashear contraseña
     const hashedPassword = await bcrypt.hash(password, 10);
