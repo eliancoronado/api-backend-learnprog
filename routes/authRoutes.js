@@ -58,5 +58,4 @@ router.get("/profile/:id/cursos", async (req, res) => {
   }
 });
 
-
 module.exports = router;
