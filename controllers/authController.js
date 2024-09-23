@@ -19,9 +19,11 @@ exports.register = async (req, res) => {
     if (image) {
       const formData = new FormData();
       formData.append('image', image.buffer.toString('base64'));
-
+    
       const imgbbResponse = await axios.post(`https://api.imgbb.com/1/upload?key=${process.env.IMGBB_API_KEY}`, formData);
-      profileImageUrl = imgbbResponse.data.data.url; // Imagen subida por el usuario
+      console.log('Respuesta de imgbb:', imgbbResponse.data); // Revisa qué URL se está generando
+      
+      profileImageUrl = imgbbResponse.data.data.url; // Asegúrate de obtener el URL correcto
     }
 
     // Hashear contraseña
