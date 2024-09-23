@@ -7,6 +7,6 @@ const teacherSchema = new mongoose.Schema({
   profileImageUrl: { type: String, required: true },
 });
 
-const Teachers = mongoose.model('Teacher', teacherSchema);
+const Teacher = mongoose.model('Teacher', teacherSchema);
 
-module.exports = Teachers;
+module.exports = Teacher;
