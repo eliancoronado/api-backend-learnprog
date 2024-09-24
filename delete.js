@@ -14,7 +14,7 @@ const teacherSchema = new mongoose.Schema({
   
 const Teachers = mongoose.model('Teacher', teacherSchema);
 
-const nombre = "Elian Sieza";
+const nombre = "Manuel Gongora";
 
 Teachers.deleteOne({ username: nombre })
     .then(result => {

@@ -3,9 +3,16 @@ const Teacher = require('../models/Teacher');
 const Curso = require("../models/Cursos")
 const Student = require('../models/Students');
 const FormData = require('form-data');
+const ImageKit = require('imagekit');
 const axios = require('axios');
 
 const router = express.Router();
+
+const imagekit = new ImageKit({
+  publicKey: "public_Nz8PjU7igIvb4HJUoNUz4zh1+js=", // Asegúrate de configurar tus claves en variables de entorno
+  privateKey: "private_suEbQaCw1Z3X8R79tvApi2WYZYk=",
+  urlEndpoint: "https://ik.imagekit.io/41m0ikyq6"
+});
 
 router.post('/cursos/:id/vistas', async (req, res) => {
     try {
@@ -57,6 +64,7 @@ const upload = multer();
 
 router.put('/updateProfile/:id', upload.single('profileImage'), async (req, res) => {
   const { username } = req.body;
+  const image = req.file;
   let profileImageUrl;
 
   try {
@@ -73,13 +81,21 @@ router.put('/updateProfile/:id', upload.single('profileImage'), async (req, res)
       isTeacher = true; // Es un profesor
 
       // Manejo de imagen
-      if (req.file) {
-        const formData = new FormData();
-        formData.append('image', req.file.buffer.toString('base64'));
+      if (image) {
+        try {
+            const result = await imagekit.upload({
+                file: image.buffer.toString('base64'), // Convertimos la imagen a base64
+                fileName: image.originalname,
+                tags: ["user_profile"] // Puedes agregar etiquetas personalizadas
+            });
 
-        const imgbbResponse = await axios.post(`https://api.imgbb.com/1/upload?key=${process.env.IMGBB_API_KEY}`, formData);
-        profileImageUrl = imgbbResponse.data.data.url; // Nueva imagen
-      }
+            // Actualizamos la URL de la imagen de perfil
+            profileImageUrl = result.url;
+        } catch (imageError) {
+            console.error('Error al subir la imagen:', imageError);
+            return res.status(500).json({ message: 'Error al subir la imagen', error: imageError.message });
+        }
+    }
 
       // Actualizar los datos del profesor
       teacher.username = username || teacher.username;
@@ -89,14 +105,21 @@ router.put('/updateProfile/:id', upload.single('profileImage'), async (req, res)
       const updatedTeacher = await teacher.save();
       return res.status(200).json(updatedTeacher);
     }
-
     // Manejo de imagen
-    if (req.file) {
-      const formData = new FormData();
-      formData.append('image', req.file.buffer.toString('base64'));
+    if (image) {
+      try {
+          const result = await imagekit.upload({
+              file: image.buffer.toString('base64'), // Convertimos la imagen a base64
+              fileName: image.originalname,
+              tags: ["user_profile"] // Puedes agregar etiquetas personalizadas
+          });
 
-      const imgbbResponse = await axios.post(`https://api.imgbb.com/1/upload?key=${process.env.IMGBB_API_KEY}`, formData);
-      profileImageUrl = imgbbResponse.data.data.url; // Nueva imagen
+          // Actualizamos la URL de la imagen de perfil
+          profileImageUrl = result.url;
+      } catch (imageError) {
+          console.error('Error al subir la imagen:', imageError);
+          return res.status(500).json({ message: 'Error al subir la imagen', error: imageError.message });
+      }
     }
 
     // Actualizar los datos del estudiante
