@@ -9,4 +9,6 @@ const PostSchema = new mongoose.Schema({
   likes: { type: Number, default: 0 },
 });
 
-module.exports = mongoose.model('Post', PostSchema);
+const Post = mongoose.model('Post', PostSchema);
+
+module.exports = Post;
