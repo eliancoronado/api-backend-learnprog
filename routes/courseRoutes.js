@@ -144,4 +144,16 @@ router.put('/updateProfile/:id', upload.single('profileImage'), async (req, res)
   }
 });
 
+router.get('/buscar', async (req, res) => {
+  try {
+    const { query } = req.query; // Obtiene el término de búsqueda de la query string
+    const cursos = await Curso.find({
+      titulo: { $regex: query, $options: 'i' } // Búsqueda insensible a mayúsculas y minúsculas
+    });
+    res.json(cursos);
+  } catch (error) {
+    res.status(500).json({ error: 'Error al buscar cursos' });
+  }
+});
+
 module.exports = router;
