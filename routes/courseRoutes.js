@@ -172,25 +172,16 @@ router.post('/posts', async (req, res) => {
         return res.status(404).json({ message: 'Usuario no encontrado' });
       }
       isTeacher = true; // Es un profesor
-
-      // Crear el post
-      const newPost = new Post({
-        title,
-        message,
-        user: userId,
-        userType: 'teacher', // Indica que el usuario es un profesor
-      });
-      await newPost.save();
       return res.status(201).json(newPost);
     }
 
-    // Crear el post para un estudiante
     const newPost = new Post({
       title,
       message,
       user: userId,
-      userType: 'student', // Indica que el usuario es un estudiante
+      userType: isTeacher ? 'teacher' : 'student', // Indica si es profesor o estudiante
     });
+
     await newPost.save();
     return res.status(201).json(newPost);
   } catch (error) {
