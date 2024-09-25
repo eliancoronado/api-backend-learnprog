@@ -5,7 +5,7 @@ const Student = require('../models/Students');
 const FormData = require('form-data');
 const ImageKit = require('imagekit');
 const axios = require('axios');
-const Post = require('./models/Post');
+const Post = require('../models/Post');
 
 const router = express.Router();
 
