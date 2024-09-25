@@ -5,6 +5,7 @@ const Student = require('../models/Students');
 const FormData = require('form-data');
 const ImageKit = require('imagekit');
 const axios = require('axios');
+const Post = require('./models/Post');
 
 const router = express.Router();
 
@@ -153,6 +154,72 @@ router.get('/buscar', async (req, res) => {
     res.json(cursos);
   } catch (error) {
     res.status(500).json({ error: 'Error al buscar cursos' });
+  }
+});
+
+router.post('/posts', async (req, res) => {
+  const { title, message, userId } = req.body;
+
+  try {
+    // Verificar si el usuario es un estudiante o un profesor
+    const user = await Student.findById(userId);
+    let isTeacher = false;
+
+    if (!user) {
+      // Si no se encuentra un estudiante, buscar un profesor
+      const teacher = await Teacher.findById(userId);
+      if (!teacher) {
+        return res.status(404).json({ message: 'Usuario no encontrado' });
+      }
+      isTeacher = true; // Es un profesor
+
+      // Crear el post
+      const newPost = new Post({
+        title,
+        message,
+        user: userId,
+        userType: 'teacher', // Indica que el usuario es un profesor
+      });
+      await newPost.save();
+      return res.status(201).json(newPost);
+    }
+
+    // Crear el post para un estudiante
+    const newPost = new Post({
+      title,
+      message,
+      user: userId,
+      userType: 'student', // Indica que el usuario es un estudiante
+    });
+    await newPost.save();
+    return res.status(201).json(newPost);
+  } catch (error) {
+    console.error('Error al crear la publicación:', error);
+    return res.status(500).json({ message: 'Error del servidor al crear la publicación' });
+  }
+});
+
+// Endpoint para obtener todas las publicaciones
+router.get('/posts', async (req, res) => {
+  try {
+    const posts = await Post.find().populate('user', 'username email profileImageUrl');
+    res.json(posts);
+  } catch (error) {
+    console.error('Error al obtener publicaciones:', error);
+    res.status(500).json({ message: 'Error del servidor al obtener publicaciones' });
+  }
+});
+
+// Endpoint para manejar likes
+router.patch('/posts/:id/like', async (req, res) => {
+  try {
+    const post = await Post.findById(req.params.id);
+    post.likes += 1; // Incrementa el contador de likes
+    await post.save();
+    res.json(post);
+  } catch (error) {
+    console.error('Error al dar like a la publicación:', error);
+    res.status(500).json({ message: 'Error del servidor al dar like a la publicación' });
   }
 });
 
