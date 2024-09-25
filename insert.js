@@ -58,24 +58,24 @@ const Curso = mongoose.model('Curso', cursoSchema);
 
 // Insertar un nuevo curso
 const curso1 = new Curso({
-    clave: "curso5",
-    titulo: "Curso de EXElearning desde cero (2024)",
-    instructor: "Manuel Gongora",
-    video_url: "https://www.youtube.com/embed/qOGMIx7B3LQ?si=DE7G5yTpM0XPJCz9",
+    clave: "curso1",
+    titulo: "Curso de HTML desde cero (2024)",
+    instructor: "Elián Sieza",
+    video_url: "https://www.youtube.com/embed/C7_kK1Lj1II?si=ATroNXyEfZ5PL_sj",
     syllabus: [
-        "1. Introducción a eXeLearning para la creación web",
-        "2. Instalación y configuración para exportar a HTML",
-        "3. Diseño responsive: Creación de contenido adaptable para la web",
-        "4. Inserción de enlaces y navegación web",
-        "5. Integración de recursos multimedia: Videos y audios embebidos",
-        "6. Creación de actividades interactivas para la web",
-        "7. Uso de estilos CSS personalizados para mejorar el diseño web",
-        "8. Optimización de imágenes y videos para la web",
-        "9. Publicación de contenido eXeLearning en servidores web",
-        "10. SEO básico para materiales educativos en línea"
+        "1. Introducción al HTML y su importancia",
+        "2. Etiquetas básicas de HTML (Textos y encabezados)",
+        "3. Listas, enlaces e imágenes",
+        "4. Tablas y estructura avanzada",
+        "5. Formularios: Entrada de datos",
+        "6. Multimedia en HTML: Audio y Video",
+        "7. CSS básico para mejorar la apariencia",
+        "8. Layout y diseño con CSS (Flexbox y Grid básico)",
+        "9. Crear una página web simple",
+        "10. Proyecto: Construir una aplicación web simple"
     ],
-    descripcion: "Este curso de eXeLearning está diseñado para principiantes que desean crear y publicar contenidos educativos en formato web. ",
-    image_url: "https://i.postimg.cc/HWy84G8L/Frame-1-11.png",
+    descripcion: "En este curso aprenderás HTML desde lo más básico hasta crear una aplicación web sencilla. A través de videos interactivos, descubrirás cómo estructurar páginas web, agregar texto, imágenes, formularios y darle estilo con CSS.",
+    image_url: "https://i.postimg.cc/g0qm6dgW/html.png",
     precio: "$ Gratis"
 });
 

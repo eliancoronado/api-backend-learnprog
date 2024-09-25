@@ -56,7 +56,15 @@ router.post('/cursos/:id/vistas', async (req, res) => {
     } catch (error) {
         return res.status(500).json({ message: 'Error en el servidor' });
     }
-});
+  });
+  router.get('/teacherinfo/:username', async (req, res) => {
+    try {
+        const teacher = await Teacher.findOne({username: req.params.username});
+        res.status(200).json(teacher);
+    } catch (error) {
+        return res.status(500).json({ message: 'Error en el servidor' });
+    }
+  });
 
 
 const multer = require('multer');
