@@ -217,11 +217,10 @@ router.get('/posts', async (req, res) => {
 
 
 // Endpoint para manejar likes
-router.patch('/posts/:id/like', async (req, res) => {
+router.post('/posts/:id/like', async (req, res) => {
   try {
     const post = await Post.findById(req.params.id);
-    post.likes += 1; // Incrementa el contador de likes
-    await post.save();
+    await post.toggleLikePost(req.body.userId); // Incrementa el contador de likes
     res.json(post);
   } catch (error) {
     console.error('Error al dar like a la publicación:', error);
