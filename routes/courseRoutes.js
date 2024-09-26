@@ -172,9 +172,8 @@ router.post('/posts', async (req, res) => {
         return res.status(404).json({ message: 'Usuario no encontrado' });
       }
       isTeacher = true; // Es un profesor
-      return res.status(201).json(newPost);
     }
-
+    // Crear el post (ya sea para estudiante o profesor)
     const newPost = new Post({
       title,
       message,
@@ -189,6 +188,7 @@ router.post('/posts', async (req, res) => {
     return res.status(500).json({ message: 'Error del servidor al crear la publicación' });
   }
 });
+
 
 // Endpoint para obtener todas las publicaciones
 router.get('/posts', async (req, res) => {
