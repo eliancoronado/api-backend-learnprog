@@ -193,13 +193,21 @@ router.post('/posts', async (req, res) => {
 // Endpoint para obtener todas las publicaciones
 router.get('/posts', async (req, res) => {
   try {
-    const posts = await Post.find().populate('user', 'username email profileImageUrl');
+    const posts = await Post.find()
+      .populate({
+        path: 'user', 
+        select: 'username email profileImageUrl', 
+        model: function(doc) {
+          return doc.userType === 'student' ? 'Student' : 'Teacher';
+        }
+      });
     res.json(posts);
   } catch (error) {
     console.error('Error al obtener publicaciones:', error);
     res.status(500).json({ message: 'Error del servidor al obtener publicaciones' });
   }
 });
+
 
 // Endpoint para manejar likes
 router.patch('/posts/:id/like', async (req, res) => {
