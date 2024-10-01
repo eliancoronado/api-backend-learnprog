@@ -23,10 +23,16 @@ const cursoSchema = new mongoose.Schema({
       ref: 'Student'
     }
   ],
-  estudiantesMatriculados: [ // Lista de estudiantes matriculados
+  estudiantesMatriculados: [ // Lista de estudiantes matriculados con porcentaje de completado
     {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Student'
+      estudiante: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Student'
+      },
+      porcentajeCompletado: {
+        type: Number,
+        default: 0 // Porcentaje inicial de completado
+      }
     }
   ]
 });
@@ -56,8 +62,20 @@ cursoSchema.methods.toggleLike = function(userId) {
 
 // Método para matricular a un estudiante
 cursoSchema.methods.matricularEstudiante = function(userId) {
-  if (!this.estudiantesMatriculados.includes(userId)) {
-    this.estudiantesMatriculados.push(userId);
+  const matriculado = this.estudiantesMatriculados.find(est => est.estudiante.equals(userId));
+  
+  if (!matriculado) {
+    this.estudiantesMatriculados.push({ estudiante: userId, porcentajeCompletado: 0 });
+  }
+  return this.save();
+};
+
+// Método para actualizar el porcentaje de completado de un estudiante
+cursoSchema.methods.actualizarPorcentajeCompletado = function(userId, porcentaje) {
+  const matriculado = this.estudiantesMatriculados.find(est => est.estudiante.equals(userId));
+  
+  if (matriculado) {
+    matriculado.porcentajeCompletado = porcentaje;
   }
   return this.save();
 };

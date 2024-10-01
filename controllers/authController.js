@@ -119,8 +119,6 @@ exports.createCourse = async (req, res) => {
   }
 };
 
-
-
 // Login de usuario
 // Login de usuario
 exports.login = async (req, res) => {

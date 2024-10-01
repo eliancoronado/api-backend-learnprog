@@ -56,18 +56,25 @@ module.exports = function(io) {
         return res.status(404).json({ message: 'Curso no encontrado' });
       }
   
+      // Comprobar si hay estudiantes matriculados
+      const estudiantesMatriculados = curso.estudiantesMatriculados || [];
+  
       // Obtener detalles de cada estudiante matriculado usando Promise.all
       const estudiantesDetallados = await Promise.all(
-        curso.estudiantesMatriculados.map(async (estudianteId) => {
+        estudiantesMatriculados.map(async (estudianteInfo) => {
+          // Extraer el ID del estudiante
+          const estudianteId = estudianteInfo.estudiante || estudianteInfo._id; // Usa `estudiante` si existe, sino usa `_id`
+  
           // Encontrar al usuario estudiante y seleccionar los campos necesarios
-          const estudiante = await Student.findById(estudianteId).select('username email profileImageUrl');
+          let estudiante = await Student.findById(estudianteId).select('username email profileImageUrl');
           
           // Si no se encuentra en Student, buscar en Teacher
           if (!estudiante) {
-            return await Teacher.findById(estudianteId).select('username email profileImageUrl');
+            estudiante = await Teacher.findById(estudianteId).select('username email profileImageUrl');
           }
   
-          return estudiante;
+          // Retornar el estudiante o un objeto con información por defecto
+          return estudiante || { username: 'Desconocido', email: 'No disponible', profileImageUrl: null };
         })
       );
   
@@ -84,6 +91,8 @@ module.exports = function(io) {
       res.status(500).json({ message: 'Error del servidor al obtener el curso y los estudiantes matriculados' });
     }
   });
+  
+  
 
   router.delete('/cursos/:id', async (req, res) => {
     try {
@@ -274,18 +283,43 @@ module.exports = function(io) {
     const { userId } = req.body;
   
     try {
-      console.log(id);
+      console.log(`ID del curso: ${id}`);
       const curso = await Curso.findById(id);
       if (!curso) {
         return res.status(404).json({ message: 'Curso no encontrado' });
       }
+  
+      // Verificar si el usuario ya está matriculado
+      const yaMatriculado = curso.estudiantesMatriculados.some(
+        (estudiante) => estudiante.estudiante === userId // Asegúrate de que el campo 'estudiante' sea correcto
+      );
+  
+      if (yaMatriculado) {
+        return res.status(400).json({ message: 'El usuario ya está matriculado en este curso.' });
+      }
+  
       // Matricular al estudiante
-      await curso.matricularEstudiante(userId);
-      console.log(curso);
-      
+      curso.estudiantesMatriculados.push({ estudiante: userId }); // Ajusta el objeto según tu modelo
+  
+      await curso.save(); // Guardar los cambios en el curso
+      console.log(`Curso después de matricular: ${curso}`);
+  
       res.status(200).json({ message: 'Usuario matriculado con éxito', curso });
     } catch (error) {
+      console.error("Error al matricular al usuario:", error);
       res.status(500).json({ message: 'Error al matricular al usuario', error });
+    }
+  });
+
+  router.get('/matriculados/:userId', async (req, res) => {
+    const { userId } = req.params;
+  
+    try {
+      // Busca los cursos donde el usuario esté en la lista de estudiantes matriculados
+      const cursos = await Curso.find({ "estudiantesMatriculados.estudiante": userId });
+      res.status(200).json(cursos);
+    } catch (error) {
+      res.status(500).json({ error: 'Error al obtener los cursos matriculados' });
     }
   });
 
