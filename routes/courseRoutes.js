@@ -323,7 +323,7 @@ module.exports = function(io) {
     }
   });
 
-  router.patch('/:id/progreso', async (req, res) => {
+  router.post('/:id/progreso', async (req, res) => {
     const { userId, porcentaje } = req.body;
   
     try {
