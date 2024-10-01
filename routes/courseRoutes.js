@@ -279,10 +279,6 @@ module.exports = function(io) {
       if (!curso) {
         return res.status(404).json({ message: 'Curso no encontrado' });
       }
-      if (curso.estudiantesMatriculados.includes(userId)) {
-        return res.status(200).json({ message: 'Usuario ya esta matriculado', curso });
-        //res.status(400).json({ message: 'El usuario ya está matriculado en este curso.' });
-      }
       // Matricular al estudiante
       await curso.matricularEstudiante(userId);
       console.log(curso);
