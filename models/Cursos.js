@@ -72,13 +72,18 @@ cursoSchema.methods.matricularEstudiante = function(userId) {
 
 // Método para actualizar el porcentaje de completado de un estudiante
 cursoSchema.methods.actualizarPorcentajeCompletado = function(userId, porcentaje) {
-  const matriculado = this.estudiantesMatriculados.find(est => est.estudiante.equals(userId));
+  console.log(this.estudiantesMatriculados); // Para verificar el contenido
+
+  const matriculado = this.estudiantesMatriculados.find(est => est.estudiante && est.estudiante.equals(userId));
   
   if (matriculado) {
     matriculado.porcentajeCompletado = porcentaje;
+  } else {
+    console.error(`Estudiante no matriculado con ID: ${userId}`);
   }
   return this.save();
 };
+
 
 const Curso = mongoose.model('Curso', cursoSchema);
 
