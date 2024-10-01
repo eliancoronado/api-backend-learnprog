@@ -47,11 +47,59 @@ module.exports = function(io) {
 
   router.get('/cursos/:id', async (req, res) => {
     try {
-      const curso = await Curso.findById(req.params.id);
-      if (!curso) return res.status(404).json({ message: 'Curso no encontrado' });
-      res.status(200).json(curso);
+      const cursoId = req.params.id;
+  
+      // Encontrar el curso por su ID
+      const curso = await Curso.findById(cursoId);
+  
+      if (!curso) {
+        return res.status(404).json({ message: 'Curso no encontrado' });
+      }
+  
+      // Obtener detalles de cada estudiante matriculado usando Promise.all
+      const estudiantesDetallados = await Promise.all(
+        curso.estudiantesMatriculados.map(async (estudianteId) => {
+          // Encontrar al usuario estudiante y seleccionar los campos necesarios
+          const estudiante = await Student.findById(estudianteId).select('username email profileImageUrl');
+          
+          // Si no se encuentra en Student, buscar en Teacher
+          if (!estudiante) {
+            return await Teacher.findById(estudianteId).select('username email profileImageUrl');
+          }
+  
+          return estudiante;
+        })
+      );
+  
+      // Crear la respuesta con la información del curso y los estudiantes detallados
+      const cursoConEstudiantesDetallados = {
+        ...curso.toObject(),
+        estudiantesMatriculados: estudiantesDetallados
+      };
+  
+      // Enviar la respuesta con los datos del curso y los estudiantes
+      res.json(cursoConEstudiantesDetallados);
     } catch (error) {
-      res.status(500).json({ message: 'Error en el servidor' });
+      console.error('Error al obtener el curso y estudiantes:', error);
+      res.status(500).json({ message: 'Error del servidor al obtener el curso y los estudiantes matriculados' });
+    }
+  });
+
+  router.delete('/cursos/:id', async (req, res) => {
+    try {
+      const cursoId = req.params.id;
+  
+      // Buscar el curso por su ID y eliminarlo
+      const cursoEliminado = await Curso.findByIdAndDelete(cursoId);
+  
+      if (!cursoEliminado) {
+        return res.status(404).json({ message: 'Curso no encontrado' });
+      }
+  
+      res.json({ message: 'Curso eliminado con éxito', curso: cursoEliminado });
+    } catch (error) {
+      console.error('Error al eliminar el curso:', error);
+      res.status(500).json({ message: 'Error del servidor al eliminar el curso' });
     }
   });
 
@@ -218,6 +266,29 @@ module.exports = function(io) {
     } catch (error) {
       console.error('Error al dar like a la publicación:', error);
       res.status(500).json({ message: 'Error del servidor al dar like a la publicación' });
+    }
+  });
+
+  router.post('/matricular/:id', async (req, res) => {
+    const { id } = req.params;
+    const { userId } = req.body;
+  
+    try {
+      console.log(id);
+      const curso = await Curso.findById(id);
+      if (!curso) {
+        return res.status(404).json({ message: 'Curso no encontrado' });
+      }
+      if (curso.estudiantesMatriculados.includes(userId)) {
+        return res.status(400).json({ message: 'El usuario ya está matriculado en este curso.' });
+      }
+      // Matricular al estudiante
+      await curso.matricularEstudiante(userId);
+      console.log(curso);
+      
+      res.status(200).json({ message: 'Usuario matriculado con éxito', curso });
+    } catch (error) {
+      res.status(500).json({ message: 'Error al matricular al usuario', error });
     }
   });
 

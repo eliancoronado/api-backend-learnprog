@@ -3,6 +3,7 @@ const jwt = require('jsonwebtoken');
 const axios = require('axios');
 const ImageKit = require('imagekit');
 const Teacher = require('../models/Teacher');
+const Curso = require("../models/Cursos")
 const Student = require('../models/Students');
 
 // Inicialización del SDK de ImageKit
@@ -72,6 +73,50 @@ exports.register = async (req, res) => {
         console.error('Error en el registro:', error);
         res.status(500).json({ message: 'Error en el registro', error: error.message });
     }
+};
+
+exports.createCourse = async (req, res) => {
+  const { titulo, instructor, video_url, syllabus, descripcion } = req.body;
+  const image = req.file; // Verificamos si se ha subido una imagen
+
+  try {
+
+      // Subir imagen a ImageKit.io solo si hay imagen
+      if (image) {
+          try {
+              const result = await imagekit.upload({
+                  file: image.buffer.toString('base64'), // Convertimos la imagen a base64
+                  fileName: image.originalname,
+                  tags: ["course_image"], // Puedes agregar etiquetas personalizadas
+              });
+
+              // Actualizamos la URL de la imagen del curso
+              courseImageUrl = result.url;
+          } catch (imageError) {
+              console.error('Error al subir la imagen:', imageError);
+              return res.status(500).json({ message: 'Error al subir la imagen', error: imageError.message });
+          }
+      }
+
+      // Crear un nuevo curso con los datos recibidos
+      const newCourse = new Curso({
+          titulo,
+          instructor,
+          video_url,
+          descripcion,
+          syllabus: JSON.parse(syllabus), // Asegúrate de que syllabus sea un array
+          image_url: courseImageUrl, // Usar la URL de la imagen del curso
+      });
+
+      // Guardar curso en la base de datos
+      await newCourse.save();
+
+      // Devolver el curso creado
+      res.status(201).json(newCourse);
+  } catch (error) {
+      console.error('Error al crear el curso:', error);
+      res.status(500).json({ message: 'Error al crear el curso', error: error.message });
+  }
 };
 
 

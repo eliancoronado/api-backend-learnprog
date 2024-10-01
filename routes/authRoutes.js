@@ -7,8 +7,11 @@ const Student = require('../models/Students');
 
 const router = express.Router();
 const upload = multer(); // Middleware para subir archivos
+const { getStudentEnrollmentData } = require('../controllers/cursoController'); // Importar la función del controlador
 
+router.get('/student-data/:courseId', getStudentEnrollmentData);
 router.post('/register', upload.single('profileImage'), authController.register);
+router.post('/newcurso', upload.single('image_url'), authController.createCourse);
 router.post('/login', authController.login);
 router.get("/teachers", async (req, res) => {
     try {
