@@ -34,6 +34,19 @@ const cursoSchema = new mongoose.Schema({
         default: 0 // Porcentaje inicial de completado
       }
     }
+  ],
+  activities: [  // Arreglo de actividades
+    {
+      question: {
+        type: String,
+        required: true
+      },
+      options: [String],  // Arreglo de opciones para cada pregunta
+      answer: {
+        type: String,     // Respuesta correcta de la pregunta
+        required: true
+      }
+    }
   ]
 });
 
@@ -84,6 +97,11 @@ cursoSchema.methods.actualizarPorcentajeCompletado = function(userId, porcentaje
   return this.save();
 };
 
+// Método para añadir una actividad al curso
+cursoSchema.methods.agregarActividad = function(actividad) {
+  this.activities.push(actividad);
+  return this.save();
+};
 
 const Curso = mongoose.model('Curso', cursoSchema);
 
