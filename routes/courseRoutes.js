@@ -117,14 +117,17 @@ module.exports = function(io) {
       // Buscar si el usuario es un profesor
       const teacher = await Teacher.findOne({ email: req.params.email });
       if (teacher) {
-        // Si se encuentra un profesor, devuelve el rol de 'teacher'
-        return res.status(200).json({ role: 'teacher', teacher });
+        // Si se encuentra un profesor, agregar el rol 'teacher' al objeto
+        const teacherWithRole = { ...teacher._doc, role: 'teacher' };
+        return res.status(200).json(teacherWithRole);
       }
   
       // Si no es un profesor, buscar si es un estudiante
       const student = await Student.findOne({ email: req.params.email });
       if (student) {
-        return res.status(200).json({ role: 'student', student });
+        // Si se encuentra un estudiante, agregar el rol 'student' al objeto
+        const studentWithRole = { ...student._doc, role: 'student' };
+        return res.status(200).json(studentWithRole);
       }
   
       // Si no se encuentra ni como profesor ni como estudiante
@@ -136,7 +139,7 @@ module.exports = function(io) {
     }
   });
   
-
+  
   router.get('/teacherinfo/:username', async (req, res) => {
     try {
       const teacher = await Teacher.findOne({username: req.params.username});

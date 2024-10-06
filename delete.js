@@ -10,13 +10,14 @@ const teacherSchema = new mongoose.Schema({
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
     profileImageUrl: { type: String, required: true },
-});
+    descripcion: { type: String },
+  });
   
-const Teachers = mongoose.model('Teacher', teacherSchema);
+const Teacher = mongoose.model('Teacher', teacherSchema);
 
-const nombre = "Manuel Gongora";
+const nombre = "Manuel Góngora";
 
-Teachers.deleteOne({ username: nombre })
+Teacher.deleteOne({ username: nombre })
     .then(result => {
         if (result.deletedCount > 0) {
             console.log(`profesor con nombre ${nombre} borrado correctamente`);
