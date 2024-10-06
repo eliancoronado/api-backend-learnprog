@@ -114,16 +114,28 @@ module.exports = function(io) {
 
   router.get('/usuarioinfo/:email', async (req, res) => {
     try {
-      const teacher = await Teacher.findOne({email: req.params.email});
-      if (!teacher) {
-        const students = await Student.findOne({email: req.params.email});
-        return res.status(200).json( {role: 'student', students});
+      // Buscar si el usuario es un profesor
+      const teacher = await Teacher.findOne({ email: req.params.email });
+      if (teacher) {
+        // Si se encuentra un profesor, devuelve el rol de 'teacher'
+        return res.status(200).json({ role: 'teacher', teacher });
       }
-      return res.status(200).json( {role: 'teacher', students});
+  
+      // Si no es un profesor, buscar si es un estudiante
+      const student = await Student.findOne({ email: req.params.email });
+      if (student) {
+        return res.status(200).json({ role: 'student', student });
+      }
+  
+      // Si no se encuentra ni como profesor ni como estudiante
+      return res.status(404).json({ message: 'Usuario no encontrado' });
+  
     } catch (error) {
+      // En caso de cualquier error en el servidor
       return res.status(500).json({ message: 'Error en el servidor' });
     }
   });
+  
 
   router.get('/teacherinfo/:username', async (req, res) => {
     try {
