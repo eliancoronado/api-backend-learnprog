@@ -135,7 +135,7 @@ module.exports = function(io) {
   });
 
   router.put('/updateProfile/:id', upload.single('profileImage'), async (req, res) => {
-    const { username } = req.body;
+    const { username, descripcion } = req.body;
     const image = req.file;
     let profileImageUrl;
 
@@ -167,6 +167,7 @@ module.exports = function(io) {
 
         teacher.username = username || teacher.username;
         teacher.profileImageUrl = profileImageUrl || teacher.profileImageUrl;
+        teacher.descripcion = descripcion || teacher.descripcion;
         const updatedTeacher = await teacher.save();
         return res.status(200).json(updatedTeacher);
       }
@@ -188,6 +189,7 @@ module.exports = function(io) {
 
       user.username = username || user.username;
       user.profileImageUrl = profileImageUrl || user.profileImageUrl;
+      user.descripcion = descripcion || user.descripcion;
       const updatedUser = await user.save();
       
       res.status(200).json(updatedUser);
