@@ -117,9 +117,9 @@ module.exports = function(io) {
       const teacher = await Teacher.findOne({email: req.params.email});
       if (!teacher) {
         const students = await Student.findOne({email: req.params.email});
-        return res.status(200).json(students);
+        return res.status(200).json( {role: 'student', students});
       }
-      res.status(200).json(teacher);
+      return res.status(200).json( {role: 'teacher', students});
     } catch (error) {
       return res.status(500).json({ message: 'Error en el servidor' });
     }
