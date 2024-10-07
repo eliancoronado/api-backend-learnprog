@@ -1,23 +1,48 @@
 const mongoose = require('mongoose');
 
+// Definir subesquema para las actividades
+const activitySchema = new mongoose.Schema({
+  question: {
+    type: String,
+    required: true
+  },
+  options: [String], // Arreglo de opciones para cada pregunta
+  answer: {
+    type: String,    // Respuesta correcta de la pregunta
+    required: true
+  }
+});
+
+// Definir subesquema para los temas del syllabus
+const temaSchema = new mongoose.Schema({
+  titulo: {
+    type: String,
+    required: true
+  },
+  video_url: String,
+  descripcion: String,
+  activities: [activitySchema] // Cada tema puede tener un arreglo de actividades
+});
+
+// Definir el esquema principal del curso
 const cursoSchema = new mongoose.Schema({
   clave: String,
   titulo: String,
   instructor: String,
   video_url: String,
-  syllabus: [String], // Temario del curso
-  descripcion: String, // Descripción del curso
-  image_url: String,   // URL de la imagen del curso
-  precio: String,      // Precio del curso
-  vistas: {            // Conteo de vistas por usuario
+  syllabus: [temaSchema], // Syllabus será un arreglo de temas, cada uno con sus propias actividades
+  descripcion: String,
+  image_url: String,  // URL de la imagen del curso
+  precio: String,     // Precio del curso
+  vistas: {           // Conteo de vistas por usuario
     type: Number,
     default: 0
   },
-  likes: {             // Conteo de likes
+  likes: {            // Conteo de likes
     type: Number,
     default: 0
   },
-  usuariosLikes: [      // Almacenar usuarios que han dado like para evitar más de uno
+  usuariosLikes: [     // Almacenar usuarios que han dado like para evitar más de uno
     {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Student'
@@ -35,19 +60,6 @@ const cursoSchema = new mongoose.Schema({
       }
     }
   ],
-  activities: [  // Arreglo de actividades
-    {
-      question: {
-        type: String,
-        required: true
-      },
-      options: [String],  // Arreglo de opciones para cada pregunta
-      answer: {
-        type: String,     // Respuesta correcta de la pregunta
-        required: true
-      }
-    }
-  ]
 });
 
 // Método para aumentar vistas
