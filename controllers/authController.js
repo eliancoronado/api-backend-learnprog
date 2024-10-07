@@ -83,7 +83,19 @@ exports.createCourse = async (req, res) => {
   try {
     // Subir imagen a ImageKit.io solo si hay imagen
     if (image) {
-      // (Código para subir la imagen...)
+      try {
+        const result = await imagekit.upload({
+          file: image.buffer.toString('base64'), // Convertimos la imagen a base64
+          fileName: image.originalname,
+          tags: ["course_image"], // Agrega etiquetas personalizadas si es necesario
+        });
+
+        // Asigna la URL de la imagen del curso subida a ImageKit
+        courseImageUrl = result.url;
+      } catch (imageError) {
+        console.error('Error al subir la imagen:', imageError);
+        return res.status(500).json({ message: 'Error al subir la imagen', error: imageError.message });
+      }
     }
 
     // Crear un nuevo curso con los datos recibidos
